@@ -456,19 +456,18 @@
     sendBtn.disabled = true;
 
     try{
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 1000,
-          system: "Você é o pedro.bot, uma 'segunda mente' que ajuda a pessoa a resolver dúvidas do dia a dia. Responda em português do Brasil, de forma direta, clara e curta (poucos parágrafos), sem enrolação. Seja prestativo e vá direto ao ponto, mas com um tom próximo e humano.",
-          messages: history
-        })
+        body: JSON.stringify({ messages: history })
       });
 
       const data = await response.json();
       hideTyping();
+
+      if(!response.ok){
+        throw new Error(data.error || "Erro desconhecido");
+      }
 
       const textBlock = (data.content || []).find(c => c.type === 'text');
       const reply = textBlock ? textBlock.text : "Deu ruim aqui do meu lado, tenta perguntar de novo?";
